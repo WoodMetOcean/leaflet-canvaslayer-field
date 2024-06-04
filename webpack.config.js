@@ -1,38 +1,46 @@
-// webpack.config.js
-const webpack = require('webpack');
 const path = require('path');
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const WebpackShellPluginNext = require('webpack-shell-plugin-next');
+
+// webpack.config.js
 
 const config = {
     context: path.resolve(__dirname, 'src'),
     entry: './_main.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'leaflet.canvaslayer.field.js'
+        filename: 'leaflet.canvaslayer.field.js',
+        clean: true,
     },
+    resolve: {
+        fallback: {
+            "fs": false,
+            "tls": false,
+            "net": false,
+            "path": false,
+            "zlib": false,
+            "http": false,
+            "https": false,
+            "url": false,
+        }
+    },
+    mode: 'production',
     devtool: 'source-map',
     module: {
         rules: [
             {
-                enforce: 'pre',
                 test: /\.js$/,
                 include: path.resolve(__dirname, 'src'),
-                exclude: '/node_modules/',
-                loader: 'eslint-loader'
-            },
-            {
-                test: /\.js$/,
-                include: path.resolve(__dirname, 'src'),
-                exclude: '/node_modules/',
+                exclude: /node_modules/,
                 use: [
                     {
                         loader: 'babel-loader',
                         options: {
                             presets: [
                                 [
-                                    'es2015',
+                                    '@babel/preset-env',
                                     {
-                                        modules: false
+                                        modules: false,
+                                        targets: "defaults" 
                                     }
                                 ]
                             ]
@@ -43,7 +51,7 @@ const config = {
         ]
     },
     plugins: [
-        new WebpackShellPlugin({
+        new WebpackShellPluginNext({
             onBuildStart: ['echo "Webpack Start"'],
             onBuildEnd: ['node copy-to-examples.js']
         })
